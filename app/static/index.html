@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Research Desk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%233987e5'/%3E%3Crect x='3.2' y='8.6' width='2.2' height='4.2' rx='.6' fill='white'/%3E%3Crect x='6.9' y='5.6' width='2.2' height='7.2' rx='.6' fill='white'/%3E%3Crect x='10.6' y='3.2' width='2.2' height='9.6' rx='.6' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="mark">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.2" y="8.6" width="2.2" height="4.2" rx=".6"/><rect x="6.9" y="5.6" width="2.2" height="7.2" rx=".6"/><rect x="10.6" y="3.2" width="2.2" height="9.6" rx=".6"/></svg>
+    <span>Research Desk</span>
+  </div>
+
+  <nav class="seg" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="ideas">Ideas</button>
+    <button role="tab" aria-selected="false" data-tab="pipeline">Pipeline</button>
+    <button role="tab" aria-selected="false" data-tab="requests">Requests</button>
+    <button role="tab" aria-selected="false" data-tab="method">Method</button>
+  </nav>
+
+  <div class="stats" id="stats" hidden></div>
+  <button class="ghost demo" id="demo" title="Autonomous end-to-end demo"><span class="tri">&#9654;</span><span id="demo-label">Demo</span></button>
+  <button class="icon" id="theme" title="Toggle light / dark" aria-label="Toggle light or dark">◐</button>
+  <button class="run" id="run"><span class="dot"></span><span id="run-label">Run</span></button>
+</header>
+
+<div class="flow" id="flow"></div>
+
+<div class="body">
+  <main class="pane" id="pane">
+
+    <section id="tab-ideas">
+      <div class="hero" id="hero">
+        <h2>Live market news, read into ranked trade ideas.</h2>
+        <p>Company profiles and headlines come from yfinance. A System One model turns them
+           into typed judgments &mdash; exposure, mechanism, direction, grounding &mdash; and
+           code does the ranking and the routing.</p>
+        <p class="dim">Press <b>Run</b>. One pass is roughly 35 requests and costs about a
+           fifth of a cent.</p>
+      </div>
+
+      <div id="ideas-wrap" hidden>
+        <div class="toolbar">
+          <div class="tallies" id="tallies"></div>
+          <button class="ghost" id="toggle-weights" aria-expanded="false">Weights</button>
+          <button class="ghost" id="toggle-all">Expand all</button>
+        </div>
+        <div class="sheet" id="weights-panel" hidden>
+          <div class="weights" id="weights"></div>
+          <p class="note">Re-ranks in the browser. <b>No new requests</b> &mdash; the evidence
+            and the question meanings did not change, so there is nothing to ask again.</p>
+        </div>
+        <div id="ideas"></div>
+      </div>
+    </section>
+
+    <section id="tab-pipeline" hidden>
+      <h2 class="sec">Stage 1 <span>Triage</span></h2>
+      <p class="sec-note">Six questions per story in one request. Code drops what fails the
+        gates. Yahoo files a story under a ticker's feed without promising it is about that
+        company, so that provenance is shown here and deliberately withheld from the model.</p>
+      <div class="sheet flush"><div class="scroll"><table id="triage"></table></div></div>
+
+      <h2 class="sec">Stage 2 <span>Exposure</span></h2>
+      <p class="sec-note">One Score per watchlist name plus a summary Choice, all in a single
+        request per story.</p>
+      <div id="exposure"></div>
+
+      <h2 class="sec">Universe</h2>
+      <p class="sec-note">The investable universe is code's. Profiles are live from yfinance.</p>
+      <div class="sheet flush"><div class="scroll"><table id="wl"></table></div></div>
+    </section>
+
+    <section id="tab-requests" hidden>
+      <h2 class="sec">Request log</h2>
+      <p class="sec-note">Every call this run made. State in, typed answers out &mdash; nothing
+        is parsed from prose.</p>
+      <div id="calls"><p class="dim">Nothing yet.</p></div>
+    </section>
+
+    <section id="tab-method" hidden>
+      <h2 class="sec">Five stages, four of them judgments</h2>
+      <div class="sheet">
+        <ol class="method">
+          <li><b>Triage</b><span>Six questions per story in one request: market-moving (Noul),
+            event type (Choice), magnitude (Score), horizon (Choice), unconfirmed rumour
+            (Noul), and whether the text tries to instruct the reader (Noul). Code gates on the
+            probabilities &mdash; that last one is a prompt-injection guard that rides along at
+            no extra cost.</span></li>
+          <li><b>Exposure</b><span>One Score per watchlist name plus one Choice, all in the same
+            request. Six names cost one call, not six: the state is read once and every
+            question is answered against it.</span></li>
+          <li><b>Mechanism</b><span>The transmission mechanism is <i>selected</i> from a
+            catalogue code owns, never written freehand, so it is always one of nine known
+            values. Four Nouls probe the link: evidenced, direct, priced in,
+            near-term.</span></li>
+          <li><b>Grounding</b><span>Code assembles the thesis from judgments already returned,
+            then a separate request checks it against the story. Probabilities land in a
+            YES / UNCLEAR / NO band <i>code</i> draws, rather than the model electing an
+            "unclear" token.</span></li>
+          <li><b>Composition</b><span>Pure arithmetic. Weights, thresholds and routing live in
+            code, so re-weighting costs nothing.</span></li>
+        </ol>
+      </div>
+      <div class="sheet">
+        <h3>Where uncertainty goes</h3>
+        <p class="copy">Choice and Score answers carry a confidence derived from their
+          distribution; a Noul near 0.5 means the model genuinely cannot separate yes from no.
+          The desk routes on both, so an idea with a sound thesis but a weak strongest-mechanism
+          confidence goes to review rather than publish.</p>
+        <h3>Honesty</h3>
+        <p class="copy">Profiles, prices and headlines are live and shown as retrieved; the desk
+          does not clean up what Yahoo returns. Every threshold in
+          <code>desk/questions.py</code> is a starting guess, not a value fitted to real
+          outcomes. With a noisy live feed many runs produce one publishable idea or none
+          &mdash; that is the filter working. Nothing here is investment advice.</p>
+        <h3>Recording a run</h3>
+        <p class="copy">Append <code>?autorun=1&amp;pace=700</code> to the URL. Pacing inserts a
+          pause between stages so the funnel is followable on camera; it never changes how the
+          work is done, and the reported wall clock has the pauses subtracted back out. The
+          header shows <b>paced</b> whenever it is on.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="stream" id="stream">
+    <div class="stream-head">
+      <span>Live requests</span>
+      <span class="dim num" id="stream-count">0</span>
+    </div>
+    <div class="stream-body" id="stream-body">
+      <p class="dim empty-note">Requests appear here as they land.</p>
+    </div>
+  </aside>
+</div>
+
+<div class="cursor" id="cursor" hidden aria-hidden="true"></div>
+
+<div class="cap" id="cap" hidden role="status" aria-live="polite">
+  <div class="cap-bar"><i id="cap-bar"></i></div>
+  <div class="cap-in">
+    <div class="cap-copy">
+      <div class="cap-text" id="cap-text"></div>
+      <div class="cap-sub" id="cap-sub" hidden></div>
+    </div>
+    <div class="cap-step num" id="cap-step"></div>
+  </div>
+  <div class="cap-esc">esc to stop</div>
+</div>
+
+<script src="/static/app.js"></script>
+<script src="/static/tour.js"></script>
+</body>
+</html>

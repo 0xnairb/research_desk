@@ -1,0 +1,18 @@
+# secrets
+.env
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.cache/
+
+# tooling state
+.fab7/
+.playwright-mcp/
+
+# not published
+marketing/
+
+# os
+.DS_Store
